@@ -1,0 +1,1 @@
+alias generateDiagrams="([ -f plantuml.jar ] || curl -o plantuml.jar https://repo.maven.apache.org/maven2/net/sourceforge/plantuml/plantuml/1.2020.13/plantuml-1.2020.13.jar) && java -jar plantuml.jar -o documentation/assets -charset UTF-8 \"**.md\""
