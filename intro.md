@@ -111,6 +111,10 @@ assertThat(collect).isEqualTo(API.Map(
 
 Ici, on utilise la fonction currifiée pour transformer les valeurs d’une Map, mais puisque les types Vavr sont des spécialisations de types Java aussi souvent que possible, elles peuvent être utilisées dans les Stream, ou dans des librairies comme [Reactor](https://projectreactor.io/).
 
+## Une autre approche des collections
+
+Les collections java existantes sont conçues pour être mutées ou copiées intégralement. Certains [collecteurs](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/stream/Collectors.html#toUnmodifiableList()) ou factories peuvent faire croire qu'il existe des collections immuables, mais une lecture du code montre qu'il s'agit en réalité de structures mutables protégés contre les modifications.
+
 ![
     @startmindmap headdump
     * vavr
