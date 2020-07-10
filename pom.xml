@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>eu.delafoy</groupId>
+	<artifactId>vavr-intro</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Article de blog d'intro a Vavr</name>
+	<description>Une suite d'articles de blog et les exemples qui vont avec</description>
+	<properties>
+		<maven.compiler.target>1.14</maven.compiler.target>
+		<maven.compiler.source>1.14</maven.compiler.source>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>io.vavr</groupId>
+			<artifactId>vavr</artifactId>
+			<version>1.0.0-alpha-3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-vavr</artifactId>
+			<version>0.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.6.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

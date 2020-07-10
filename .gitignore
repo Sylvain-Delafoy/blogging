@@ -1,1 +1,5 @@
 /plantuml.jar
+/.settings
+/target
+/.classpath
+/.project
