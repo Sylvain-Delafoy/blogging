@@ -18,17 +18,16 @@ L’utilisation d’une telle librairie ne doit pas se faire dans le but d'appre
 Java 8 et ses successeurs ont introduit les Fonctions sous la forme d'un ensemble de classes (Function, Supplier, Consummer, Bifunction,...). Les compostants Java peuvent être composés en partie (Function#compose et Function#andThen). Vavr apporte une coherence, toutes ses fonctions retournent une valeur et sont composables
 
 ```java
-    Supplier<Integer> java = () -> 4;
-    assertThat(java.get()).isEqualTo(4);
+		Supplier<Integer> java = () -> 4;
+		assertThat(java.get()).isEqualTo(4);
 
-    Function0<Integer> vavr = API.Function(() -> 4);
-    assertThat(vavr.apply()).isEqualTo(4);
-    // Vavr essaie de faire implémenter à ses types leur équivalent java
-    assertThat(vavr.get()).isEqualTo(4);
+		Function0<Integer> vavr = (() -> 4);
+		assertThat(vavr.apply()).isEqualTo(4);
+		// Vavr essaie de faire implémenter a ses types leur équivalent java
+		assertThat(vavr.get()).isEqualTo(4);
 
-    // Tout en apportant quelques méthodes manquant dans Java.
-    assertThat(vavr.andThen(x -> x + 2).apply()).isEqualTo(6);
-```
+		// Tout en apportant quelques méthodes manquant dans Java.
+		assertThat(vavr.andThen(x -> x + 2).apply()).isEqualTo(6);```
 
 Vavr offre aussi quelques utilitaires supplémentaires.
 
@@ -37,36 +36,34 @@ Vavr offre aussi quelques utilitaires supplémentaires.
 Lorsqu'une fonction effectue un traitement coûteux, il peut être utile de stocker son résultat. En programmation fonctionnelle cela s'appelle la La [Mémoisation](https://fr.wikipedia.org/wiki/M%C3%A9mo%C3%AFsation).
 
 ```java
-
-	private Function1<Integer, Integer> doStuffAndIncrement(AtomicInteger counter) {
-		return t1 -> {
-			counter.incrementAndGet();
-			return t1 * 2;
+	@Test
+	void uneFonctionEstGénéralementExecutéeAChaqueAppel() {
+		AtomicInteger compteur = new AtomicInteger();
+		Function1<Integer, Integer> fonctionBrute = (Integer i) -> {
+			compteur.incrementAndGet();
+			return i * 2;
 		};
+
+		assertThat(fonctionBrute.apply(3)).isEqualTo(6);
+		assertThat(compteur).hasValue(1);
+		assertThat(fonctionBrute.apply(3)).isEqualTo(6);
+		assertThat(compteur).hasValue(2);
 	}
 
 	@Test
-	void functionCallsCountsUsuallyKeepGrowing() {
-		AtomicInteger counter = new AtomicInteger();
-		Function1<Integer, Integer> noMemoize = doStuffAndIncrement(counter);
-
-		assertThat(noMemoize.apply(3)).isEqualTo(6);
-		assertThat(counter).hasValue(1);
-		assertThat(noMemoize.apply(3)).isEqualTo(6);
-		assertThat(counter).hasValue(2);
-	}
-
-
-	@Test
-	void memoizedFunctionComputationsAreDoneOnlyWhenUsefull() {
-		AtomicInteger counter = new AtomicInteger();
-		Function1<Integer, Integer> memoized = doStuffAndIncrement(counter).memoized();
-		assertThat(memoized.apply(3)).isEqualTo(6);
-		assertThat(counter).hasValue(1);
-		assertThat(memoized.apply(4)).isEqualTo(8);
-		assertThat(counter).hasValue(2);
-		assertThat(memoized.apply(3)).isEqualTo(6);
-		assertThat(counter).hasValue(2);
+	void uneFonctionMemoïséeNeFaitPasLeTravailDeuxFois() {
+		AtomicInteger compteur = new AtomicInteger();
+		// Ici, il faut "aider" java pour pouvoir appeller une méthode sur la fonction.
+		Function1<Integer, Integer> fonctionMemoïzée = API.Function((Integer i) -> {
+			compteur.incrementAndGet();
+			return i * 2;
+		}).memoized();
+		assertThat(fonctionMemoïzée.apply(3)).isEqualTo(6);
+		assertThat(compteur).hasValue(1);
+		assertThat(fonctionMemoïzée.apply(4)).isEqualTo(8);
+		assertThat(compteur).hasValue(2);
+		assertThat(fonctionMemoïzée.apply(3)).isEqualTo(6);
+		assertThat(compteur).hasValue(2);
 	}
 ```
 Dans le premier cas, chaque appel execute le code (incremente le compteur et multiplie le paramètre par 2) avant de retourner la valeur.
