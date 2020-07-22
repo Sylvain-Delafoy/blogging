@@ -11,6 +11,7 @@ import io.vavr.API;
 import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.Function2;
+import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 
 class FunctionDemo {
@@ -46,7 +47,7 @@ class FunctionDemo {
 	@Test
 	void uneFonctionMemoïséeNeFaitPasLeTravailDeuxFois() {
 		AtomicInteger compteur = new AtomicInteger();
-		// Ici, il faut "aider" java pour pouvoir appeller une méthode sur la fonction.
+		// Ici, il faut « aider » java pour pouvoir appeler une méthode sur la fonction.
 		Function1<Integer, Integer> fonctionMemoïzée = API.Function((Integer i) -> {
 			compteur.incrementAndGet();
 			return i * 2;
@@ -59,33 +60,38 @@ class FunctionDemo {
 		assertThat(compteur).hasValue(2);
 	}
 
-	// Il s'agit de la version Vavr des set qui sont des structures immutables
-	private static final Set<String> ARTICLES_PERMANENTS = API.Set("Pain", "Croissant", "Pain au chocolat");
-	private static final Set<String> EXTRAS_NOËL = API.Set("Buche Chocolat");
-	private static final Set<String> EXTRAS_ÉPIPHANIE = API.Set("Galette");
+	@Test
+	void lesFonctionsPeuventÊtreCurryfiées() throws Exception {
+		Function2<Integer, Integer, Integer> add = (x, y) -> x + y;
+		Function1<Integer, Integer> addOne = add.apply(1);
+		assertThat(addOne.apply(1)).isEqualTo(2);
+		assertThat(addOne.apply(5)).isEqualTo(6);
+	}
 
 	@Test
-	void lesFonctionsPeuventÊtreCurrifiées() throws Exception {
-		// Un catalogue est un ensemble de (noms de) produits permanents et saisonniers.
-		Function2<Set<String>, Set<String>, Set<String>> créerUnCatalogue = API.Function(Set<String>::addAll);
+	void lesFonctionsCurryfiéeSontParfaitesEnParamêtres() throws Exception {
+		// Nous éviterons d’utiliser « var » et les imports statiques pour faciliter la
+		// compréhension.
+		// Les collections de Vavr utilisées ici sont immuable.
 
-		// La currification permet de créer une fonction qui prends en paramètre les
-		// articles saisonniers et retourne le catalogue complet.
-		Function1<Set<String>, Set<String>> créerLeCatalogueSaisonnier = créerUnCatalogue
-				.curried()
-				.apply(ARTICLES_PERMANENTS);
+		Function2<Set<String>, Set<String>, Set<String>> créerUnCatalogueSaisonnier =
+				(articlesPermanents, articlesSaisonniers) -> articlesPermanents.addAll(articlesSaisonniers);
 
-		Set<String> catalogueNoël = créerLeCatalogueSaisonnier.apply(EXTRAS_NOËL);
-		assertThat(catalogueNoël).containsExactlyInAnyOrder(
-				"Pain", "Croissant", "Pain au chocolat",
-				"Buche Chocolat");
+		// La curryfication permet de créer une fonction dont les premiers paramètres
+		// sont déjà renseignés.
+		Set<String> articlesPermanents = API.Set("Pain", "Croissant", "Pain au chocolat");
+		Function1<Set<String>, Set<String>> créerLeCatalogueSaisonnier =
+				créerUnCatalogueSaisonnier .apply(articlesPermanents);
 
-		Set<String> catalogueÉpiphanie = créerLeCatalogueSaisonnier.apply(EXTRAS_ÉPIPHANIE);
-		assertThat(catalogueÉpiphanie).containsExactlyInAnyOrder(
-				"Pain", "Croissant", "Pain au chocolat",
-				"Galette");
+		// La fonction curryfiée peut ensuite être utilisée.
+		Map<String, Set<String>> extras = API.Map(
+				"Noël", API.Set("Buche Chocolat"),
+				"Épiphanie", API.Set("Galette"));
 
-		assertThat(ARTICLES_PERMANENTS).containsExactlyInAnyOrder(
-				"Pain", "Croissant", "Pain au chocolat");
+		Map<String, Set<String>> collect = extras.mapValues(créerLeCatalogueSaisonnier);
+
+		assertThat(collect).isEqualTo(API.Map(
+				"Noël", API.Set("Pain", "Croissant", "Pain au chocolat", "Buche Chocolat"),
+				"Épiphanie", API.Set("Pain", "Croissant", "Pain au chocolat", "Galette")));
 	}
 }
