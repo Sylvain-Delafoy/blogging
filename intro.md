@@ -109,8 +109,18 @@ assertThat(collect).isEqualTo(API.Map(
         "Épiphanie", API.Set("Pain", "Croissant", "Pain au chocolat", "Galette")));
 ```
 
-Ici, on utilise la fonction currifiée pour transformer les valeurs d’une Map, mais puisque les types Vavr sont des spécialisations de types Java aussi souvent que possible, elles peuvent être utilisées dans les Stream, ou dans des librairies comme [Reactor](https://projectreactor.io/).
+Ici, on utilise la fonction currifiée pour transformer les valeurs d’une `io.vavr.Map`, mais puisque les types Vavr sont des spécialisations de types Java aussi souvent que possible, elles peuvent être utilisées dans les Streams et Collections java, ou dans des librairies comme [Reactor](https://projectreactor.io/).
 
+## Et les Exceptions
+
+L'un des freins à l'adoption des librairies et nouveautés du langage d'inspiration fonctionnelles sont les exception "checked". Certaines doivent absolument être traités, mais le contexte jour énormément. Par exemple, une erreur de conversion d'une chaine de caractères en entier:
+* Dans le cadre d'une propriété de configuration n'a pas forcément besoin d'être interceptée l'application ne peut fonctionner sans.
+* Dans le cadre d'une saisie utilisateur dans un formulaire, mieux vaut fournir un message d'erreur que de faire échouer le traitement.
+
+Dans Java, ce type de distinctions se fait au niveau du langage ce qui est souvent inadapté. Et cela se ressent plus depuis java 8.
+```java
+
+```
 ![
     @startmindmap headdump
     * vavr
@@ -135,7 +145,7 @@ Ici, on utilise la fonction currifiée pour transformer les valeurs d’une Map,
     *** Options
     *** les switch expressions
     ** Les classes peuvent être converties en java
-    *** Functions
-    **** CheckedFunctions
+    ** Functions
+    *** CheckedFunctions
     @endmindmap
 ](documentation/assets/headdump.png)
